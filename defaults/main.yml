@@ -1,0 +1,10 @@
+# The username of the user for which fonts will be configured
+fonts_user: "{{ ansible_user }}"
+fonts_xdg_config_home: "/home/{{ fonts_user }}/.config"
+fonts_xdg_data_home: "/home/{{ fonts_user }}/.local/share"
+# The name of NerdFonts as they appear in https://github.com/ryanoasis/nerd-fonts/tree/master/patched-fonts.
+# See: https://github.com/ryanoasis/nerd-fonts
+fonts_nerd_font_font_names:
+  - "FiraCode"
+  - "Hack"
+  - "Noto"

@@ -1,0 +1,126 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+
+  tasks:
+  - name: Stat fontconfig directory.
+    ansible.builtin.stat:
+      path: "{{ fonts_xdg_config_home }}/fontconfig"
+    register: r_stat_fontconfig_directory
+
+  - name: Assert fontconfig directory exists with correct permissions.
+    ansible.builtin.assert:
+      that:
+        - r_stat_fontconfig_directory.stat.isdir is defined
+        - r_stat_fontconfig_directory.stat.isdir
+        - r_stat_fontconfig_directory.stat.gr_name is defined
+        - r_stat_fontconfig_directory.stat.gr_name == "suzanne"
+        - r_stat_fontconfig_directory.stat.pw_name is defined
+        - r_stat_fontconfig_directory.stat.pw_name == "suzanne"
+        - r_stat_fontconfig_directory.stat.mode is defined
+        - r_stat_fontconfig_directory.stat.mode == "0755"
+
+  - name: Stat fontconfig/conf.d directory.
+    ansible.builtin.stat:
+      path: "{{ fonts_xdg_config_home }}/fontconfig/conf.d"
+    register: r_stat_confd_directory
+
+  - name: Assert fontconfig/conf.d directory exists with correct permissions.
+    ansible.builtin.assert:
+      that:
+        - r_stat_confd_directory.stat.isdir is defined
+        - r_stat_confd_directory.stat.isdir
+        - r_stat_confd_directory.stat.gr_name is defined
+        - r_stat_confd_directory.stat.gr_name == "suzanne"
+        - r_stat_confd_directory.stat.pw_name is defined
+        - r_stat_confd_directory.stat.pw_name == "suzanne"
+        - r_stat_confd_directory.stat.mode is defined
+        - r_stat_confd_directory.stat.mode == "0755"
+
+  - name: Stat 01-emoji.conf file.
+    ansible.builtin.stat:
+      path: "{{ fonts_xdg_config_home }}/fontconfig/conf.d/01-emoji.conf"
+    register: r_stat_01_emoji_conf
+
+  - name: Assert 01-emoji.conf file exists with correct permissions.
+    ansible.builtin.assert:
+      that:
+        - r_stat_01_emoji_conf.stat.exists is defined
+        - r_stat_01_emoji_conf.stat.exists == true
+        - r_stat_01_emoji_conf.stat.isdir is defined
+        - r_stat_01_emoji_conf.stat.isdir == false
+        - r_stat_01_emoji_conf.stat.gr_name is defined
+        - r_stat_01_emoji_conf.stat.gr_name == "suzanne"
+        - r_stat_01_emoji_conf.stat.pw_name is defined
+        - r_stat_01_emoji_conf.stat.pw_name == "suzanne"
+        - r_stat_01_emoji_conf.stat.mode == "0644"
+
+  - name: Stat 02-aliases.conf file.
+    ansible.builtin.stat:
+      path: "/home/{{ fonts_user }}/.config/fontconfig/conf.d/02-aliases.conf"
+    register: r_stat_02_aliases_conf
+
+  - name: Assert 02-aliases.conf file exists with correct permissions.
+    ansible.builtin.assert:
+      that:
+        - r_stat_02_aliases_conf.stat.exists is defined
+        - r_stat_02_aliases_conf.stat.exists == true
+        - r_stat_02_aliases_conf.stat.isdir is defined
+        - r_stat_02_aliases_conf.stat.isdir == false
+        - r_stat_02_aliases_conf.stat.gr_name is defined
+        - r_stat_02_aliases_conf.stat.gr_name == "suzanne"
+        - r_stat_02_aliases_conf.stat.pw_name is defined
+        - r_stat_02_aliases_conf.stat.pw_name == "suzanne"
+        - r_stat_01_emoji_conf.stat.mode == "0644"
+
+  - name: Stat fonts directory.
+    ansible.builtin.stat:
+      path: "/home/{{ fonts_user }}/.local/share/fonts"
+    register: r_stat_fonts_directory
+
+  - name: Assert fonts directory exists with correct permissions.
+    ansible.builtin.assert:
+      that:
+        - r_stat_fonts_directory.stat.isdir is defined
+        - r_stat_fonts_directory.stat.isdir
+        - r_stat_fonts_directory.stat.gr_name is defined
+        - r_stat_fonts_directory.stat.gr_name == "suzanne"
+        - r_stat_fonts_directory.stat.pw_name is defined
+        - r_stat_fonts_directory.stat.pw_name == "suzanne"
+        - r_stat_fonts_directory.stat.mode is defined
+        - r_stat_fonts_directory.stat.mode == "0755"
+
+  - name: Stat fonts/NerdFonts directory.
+    ansible.builtin.stat:
+      path: "/home/{{ fonts_user }}/.local/share/fonts/NerdFonts"
+    register: r_stat_nerdfonts_directory
+
+  - name: Assert NerdFonts directory exists with correct permissions.
+    ansible.builtin.assert:
+      that:
+        - r_stat_nerdfonts_directory.stat.isdir is defined
+        - r_stat_nerdfonts_directory.stat.isdir
+        - r_stat_nerdfonts_directory.stat.gr_name is defined
+        - r_stat_nerdfonts_directory.stat.gr_name == "suzanne"
+        - r_stat_nerdfonts_directory.stat.pw_name is defined
+        - r_stat_nerdfonts_directory.stat.pw_name == "suzanne"
+        - r_stat_nerdfonts_directory.stat.mode is defined
+        - r_stat_nerdfonts_directory.stat.mode == "0755"
+
+  - name: Stat "Hack Regular Nerd Font Complete.ttf" file
+    ansible.builtin.stat:
+      path: "/home/{{ fonts_user }}/.local/share/fonts/NerdFonts/Hack Regular Nerd Font Complete.ttf"
+    register: r_stat_hack_regular_file
+
+  - name: Assert "Hack Regular Nerd Font Complete.ttf" file exists with correct permissions.
+    ansible.builtin.assert:
+      that:
+        - r_stat_hack_regular_file.stat.isdir is defined
+        - not r_stat_hack_regular_file.stat.isdir
+        - r_stat_hack_regular_file.stat.gr_name is defined
+        - r_stat_hack_regular_file.stat.gr_name == "suzanne"
+        - r_stat_hack_regular_file.stat.pw_name is defined
+        - r_stat_hack_regular_file.stat.pw_name == "suzanne"
+        - r_stat_hack_regular_file.stat.mode is defined
+        - r_stat_hack_regular_file.stat.mode == "0644"

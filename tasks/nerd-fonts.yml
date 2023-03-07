@@ -1,0 +1,85 @@
+---
+# The acl apt package includes the setfacl binary
+# which is required by Ansible to handle permissions when using
+# become_user with non-root users.
+# See: https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_privilege_escalation.html#risks-of-becoming-an-unprivileged-user.
+# See: https://packages.debian.org/sid/acl
+- name: Ensure acl apt package is installed.
+  ansible.builtin.apt:
+    name: acl
+    state: present
+  become: true
+  become_user: root
+
+- name: Create NerdFonts directory.
+  ansible.builtin.file:
+    path: "{{ fonts_xdg_data_home }}/fonts/NerdFonts"
+    mode: 0755
+    owner: "{{ fonts_user }}"
+    group: "{{ fonts_user }}"
+    state: directory
+  become: true
+  become_user: "{{ fonts_user }}"
+
+- name: Ensure python3-pip and python3-venv apt packages are installed.
+  ansible.builtin.apt:
+    name:
+      - python3-pip
+      - python3-venv
+    state: present
+  become: true
+  become_user: root
+
+# The community.general.github_release module has a dependency
+# on the github3 python package.
+# At the time of writing, there is no apt package available,
+# so we create an use a python3 virtual environment and install github3 there.
+- name: Ensure virtualenv directory exists.
+  ansible.builtin.file:
+    path: /tmp/ansible-role-fonts-venv
+    state: directory
+    mode: 0755
+
+- name: Install github3 python package to virtualenv.
+  ansible.builtin.pip:
+    name: github3.py
+    state: present
+    virtualenv: /tmp/ansible-role-fonts-venv
+    virtualenv_command: /usr/bin/python3 -m venv
+    virtualenv_site_packages: yes
+
+- name: Ensure Ansible uses virtualenv.
+  ansible.builtin.set_fact:
+    ansible_python_interpreter: /tmp/ansible-role-fonts-venv/bin/python
+
+- name: Get latest release of NerdFonts repo.
+  community.general.github_release:
+    user: ryanoasis
+    repo: nerd-fonts
+    action: latest_release
+  register: r_release_result
+
+# The ansible.builtin.unarchive module has a dependency on unzip.
+- name: Ensure unzip apt package is installed.
+  ansible.builtin.apt:
+    name: unzip
+    state: present
+  become: true
+  become_user: root
+
+- name: Download and extract NerdFont fonts release.
+  ansible.builtin.unarchive:
+    src: "https://github.com/ryanoasis/nerd-fonts/releases/download/{{ r_release_result.tag }}/{{ item }}.zip"
+    dest: "{{ fonts_xdg_data_home }}/fonts/NerdFonts/"
+    remote_src: true
+    owner: "{{ fonts_user }}"
+    group: "{{ fonts_user }}"
+    mode: 0644
+  loop: "{{ fonts_nerd_font_font_names }}"
+  become: true
+  become_user: "{{ fonts_user }}"
+  when: not r_release_result.failed
+  # Always download and extract the latest font files
+  # Idempotency is not maintained because the font files themselves
+  # are not versioned.
+  changed_when: false

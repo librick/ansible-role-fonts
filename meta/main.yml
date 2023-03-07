@@ -1,0 +1,16 @@
+---
+dependencies: []
+
+galaxy_info:
+  role_name: fonts
+  author: librick
+  description: Install and configure fonts.
+  license: "MIT"
+  min_ansible_version: "2.14.1"
+  platforms:
+    - name: Debian
+      versions:
+        - all
+  galaxy_tags:
+    - fonts
+    - fontconfig

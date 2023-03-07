@@ -1,0 +1,51 @@
+---
+- name: Ensure font-related apt packages are installed.
+  ansible.builtin.apt:
+    name:
+      - fontconfig
+      - libfontconfig1-dev
+      - fonts-noto-color-emoji
+    state: present
+    update_cache: true
+  become: true
+  become_user: root
+
+- name: Ensure fontconfig conf.d directory exists.
+  ansible.builtin.file:
+    path: "{{ fonts_xdg_config_home }}/fontconfig/conf.d"
+    owner: "{{ fonts_user }}"
+    group: "{{ fonts_user }}"
+    mode: 0755
+    state: directory
+  become: true
+  become_user: "{{ fonts_user }}"
+
+- name: Ensure 01-emoji.conf file is in place.
+  ansible.builtin.copy:
+    src: 01-emoji.conf
+    dest: "{{ fonts_xdg_config_home }}/fontconfig/conf.d/01-emoji.conf"
+    group: "{{ fonts_user }}"
+    owner: "{{ fonts_user }}"
+    mode: 0644
+  become: true
+  become_user: "{{ fonts_user }}"
+
+- name: Ensure 02-aliases.conf file is in place.
+  ansible.builtin.copy:
+    src: 02-aliases.conf
+    dest: "{{ fonts_xdg_config_home }}/fontconfig/conf.d/02-aliases.conf"
+    owner: "{{ fonts_user }}"
+    group: "{{ fonts_user }}"
+    mode: 0644
+  become: true
+  become_user: "{{ fonts_user }}"
+
+- name: Refresh fontconfig cache for user.
+  # From `man fc-cache`:
+  # -f: Force re-generation of apparently up-to-date cache files, overriding the timestamp checking.
+  # -v: Display status information while busy.
+  ansible.builtin.command:
+    cmd: fc-cache -v
+  become: true
+  become_user: "{{ fonts_user }}"
+  changed_when: false

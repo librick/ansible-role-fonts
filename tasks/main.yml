@@ -1,0 +1,5 @@
+---
+- name: Import nerd fonts tasks
+  ansible.builtin.import_tasks: nerd-fonts.yml
+- name: Import fontconfig tasks
+  ansible.builtin.import_tasks: fontconfig.yml
